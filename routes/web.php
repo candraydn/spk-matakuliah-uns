@@ -20,7 +20,11 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
 Route::get('/kriteria', 'KriteriaController@index')->name('kriteria');
 Route::get('/kriteria/edit/{id}', 'KriteriaController@edit')->name('kriteria.edit');
 Route::patch('/kriteria/update/{kriteria:id}', 'KriteriaController@update')->name('kriteria.update');
 
+Route::get('/alternatif', 'AlternatifController@index')->name('alternatif');
+Route::get('/alternatif/edit/{id}', 'AlternatifController@edit')->name('alternatif.edit');
+Route::patch('/alternatif/update/{id}', 'AlternatifController@update')->name('alternatif.update');

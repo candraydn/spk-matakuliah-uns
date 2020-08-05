@@ -13,7 +13,7 @@
                             @method('patch')
                             @csrf
                             <input type="text" style="width:30%" class="form-control" name="nama_kriteria" value="{{$kriteria->nama_kriteria}}"
-                                placeholder="Ketik kriteria baru">
+                                placeholder="Edit kriteria" required>
                             <button class="btn btn-success mx-2" type="submit">Kirim</button>
                         </form>
                     </div>
