@@ -39,6 +39,12 @@
                       <li class="nav-item">
                         <a class="nav-link" href="{{ route('alternatif') }}">Alternatif</a>
                       </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ route('bobot.kriteria') }}">Bobot Kriteria</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ route('bobot.alternatif') }}">Bobot Alternatif</a>
+                      </li>
                     </ul>
                   </div>
 
@@ -72,6 +78,9 @@
                                     </a>
                                     <a class="dropdown-item" href="{{ route('alternatif') }}">
                                         Alternatif
+                                    </a>
+                                    <a class="dropdown-item" href="{{ route('bobot.kriteria') }}">
+                                        Bobot Kriteria
                                     </a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
