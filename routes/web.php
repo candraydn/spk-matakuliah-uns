@@ -23,8 +23,9 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/bobot/kriteria', 'KriteriaController@bobot')->name('bobot.kriteria');
 Route::post('/bobot/kriteria/post', 'KriteriaController@postbobot')->name('bobot.kriteria.post');
-Route::get('/alternatif/bobot', 'AlternatifController@bobot')->name('bobot.alternatif');
+Route::any('/alternatif/bobot', 'AlternatifController@bobot')->name('bobot.alternatif');
 Route::post('/alternatif/bobot/post', 'AlternatifController@postbobot')->name('bobot.alternatif.post');
+Route::any('/report', 'ReportController@index')->name('report.index');
 
 
 Route::get('/kriteria', 'KriteriaController@index')->name('kriteria');

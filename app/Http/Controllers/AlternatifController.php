@@ -8,6 +8,7 @@ use App\model\Promethee;
 use App\model\PvKriteria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use phpDocumentor\Reflection\Types\Null_;
 
 class AlternatifController extends Controller
@@ -93,19 +94,28 @@ class AlternatifController extends Controller
         return redirect('/alternatif');
     }
 
-    public function bobot()
+    public function bobot(Request $request)
     {
-        $alter = Alternatif::get();
-        $krit = Kriteria::get();
-        return view('alternatif.bobot', compact(['alter','krit']));
+        if(isset($request->pilihsemester)){
+            $alter = Alternatif::where('semester_matakuliah',$request->pilihsemester)->get();
+            $krit = Kriteria::get();
+            $semester = $request->pilihsemester;
+            return view('alternatif.bobot2', compact(['alter','krit','semester']));
+        }else{
+            $alter = Alternatif::get();
+            $krit = Kriteria::get();
+            return view('alternatif.bobot', compact(['alter','krit']));
+        }
     }
 
     public function postbobot(Request $request)
     {
-        $alter = Alternatif::get();
+        $semester = $request->semester;
+        $id_user = Auth::user()->id;
+        $alter = Alternatif::where('semester_matakuliah', $semester)->get();
         $krit = Kriteria::get();
-        Promethee::truncate();
-        // dd($request->nilai11);
+        Promethee::where('semester',$semester)->where('id_user',$id_user)->delete();
+        // dd($request->nilai11);   
         foreach($krit as $k)
         {
             foreach($alter as $a)
@@ -115,6 +125,8 @@ class AlternatifController extends Controller
                 $inputalter->id_kriteria = $k['id'];
                 $inputalter->id_alternatif = $a['id'];
                 $inputalter->step = '1';
+                $inputalter->semester = $semester;
+                $inputalter->id_user = $id_user;
                 $inputalter->nilai = $request->$var;
                 $inputalter->save();
             }
@@ -128,13 +140,19 @@ class AlternatifController extends Controller
                 $aid = $a['id'];
                 $min = Promethee::where('step',1)
                         ->where('id_kriteria',$kid)
+                        ->where('semester',$semester)
+                        ->where('id_user', $id_user)
                         ->min('nilai');
                 $max = Promethee::where('step',1)
                         ->where('id_kriteria',$kid)
+                        ->where('semester',$semester)
+                        ->where('id_user', $id_user)
                         ->max('nilai');
                 $nilai = Promethee::where('step',1)
                 ->where('id_kriteria',$kid)
                 ->where('id_alternatif',$aid)
+                ->where('semester',$semester)
+                ->where('id_user', $id_user)
                 ->first();
                 $nilai = $nilai['nilai'];
                 $pembagi = $max-$min;
@@ -148,6 +166,8 @@ class AlternatifController extends Controller
                 $step2->id_kriteria = $k['id'];
                 $step2->id_alternatif = $a['id'];
                 $step2->step = '2';
+                $step2->semester = $semester;
+                $step2->id_user = $id_user;
                 $step2->nilai = $nilaiAkhir;
                 $step2->save();
             }
@@ -163,8 +183,8 @@ class AlternatifController extends Controller
                         $kid = $k['id'];
                         $aid = $a['id'];
                         $bid = $b['id'];
-                        $nilai_a = Promethee::where('step','2')->where('id_kriteria',$kid)->where('id_alternatif',$aid)->first();
-                        $nilai_b = Promethee::where('step','2')->where('id_kriteria',$kid)->where('id_alternatif',$bid)->first();
+                        $nilai_a = Promethee::where('step','2')->where('id_kriteria',$kid)->where('semester',$semester)->where('id_user', $id_user)->where('id_alternatif',$aid)->first();
+                        $nilai_b = Promethee::where('step','2')->where('id_kriteria',$kid)->where('semester',$semester)->where('id_user', $id_user)->where('id_alternatif',$bid)->first();
                         $hasil = $nilai_a['nilai'] - $nilai_b['nilai'];
                         //input to table
                         $step3 = new Promethee();
@@ -172,6 +192,8 @@ class AlternatifController extends Controller
                         $step3->id_alternatif = $a['id'];
                         $step3->id_alternatif2 = $b['id'];
                         $step3->step = '3';
+                        $step3->semester = $semester;
+                        $step3->id_user = $id_user;
                         $step3->nilai = $hasil;
                         $step3->save();
                     }
@@ -189,7 +211,7 @@ class AlternatifController extends Controller
                         $kid = $k['id'];
                         $aid = $a['id'];
                         $bid = $b['id'];
-                        $nilai_a = Promethee::where('step','3')->where('id_kriteria',$kid)->where('id_alternatif',$aid)->where('id_alternatif2',$bid)->first();
+                        $nilai_a = Promethee::where('step','3')->where('id_kriteria',$kid)->where('semester',$semester)->where('id_user', $id_user)->where('id_alternatif',$aid)->where('id_alternatif2',$bid)->first();
                         if($nilai_a['nilai']<=0){
                             $hasil = 0;
                         }else{
@@ -201,6 +223,8 @@ class AlternatifController extends Controller
                         $step4->id_alternatif = $a['id'];
                         $step4->id_alternatif2 = $b['id'];
                         $step4->step = '4';
+                        $step4->semester = $semester;
+                        $step4->id_user = $id_user;
                         $step4->nilai = $hasil;
                         $step4->save();
                     }
@@ -218,7 +242,7 @@ class AlternatifController extends Controller
                         $kid = $k['id'];
                         $aid = $a['id'];
                         $bid = $b['id'];
-                        $nilai = Promethee::where('step','4')->where('id_kriteria',$kid)->where('id_alternatif',$aid)->where('id_alternatif2',$bid)->first();
+                        $nilai = Promethee::where('step','4')->where('id_kriteria',$kid)->where('semester',$semester)->where('id_user', $id_user)->where('id_alternatif',$aid)->where('id_alternatif2',$bid)->first();
                         $pv = PvKriteria::where('id_kriteria',$kid)->first();
                         $hasil = $nilai['nilai']*$pv['nilai'];
                         //input to table
@@ -227,6 +251,8 @@ class AlternatifController extends Controller
                         $step5->id_alternatif = $a['id'];
                         $step5->id_alternatif2 = $b['id'];
                         $step5->step = '5';
+                        $step5->semester = $semester;
+                        $step5->id_user = $id_user;
                         $step5->nilai = $hasil;
                         $step5->save();
                     }
@@ -241,12 +267,14 @@ class AlternatifController extends Controller
                 if($a['id'] != $b['id']){
                     $aid = $a['id'];
                     $bid = $b['id'];
-                    $nilai = Promethee::where('step','5')->where('id_alternatif',$aid)->where('id_alternatif2',$bid)->sum('nilai');
+                    $nilai = Promethee::where('step','5')->where('id_alternatif',$aid)->where('semester',$semester)->where('id_user', $id_user)->where('id_alternatif2',$bid)->sum('nilai');
                     //input to table
                     $step6 = new Promethee();
                     $step6->id_alternatif = $a['id'];
                     $step6->id_alternatif2 = $b['id'];
                     $step6->step = '6';
+                    $step6->semester = $semester;
+                    $step6->id_user = $id_user;
                     $step6->nilai = $nilai;
                     $step6->save();
                 }else{
@@ -255,6 +283,8 @@ class AlternatifController extends Controller
                      $step6->id_alternatif = $a['id'];
                      $step6->id_alternatif2 = $b['id'];
                      $step6->step = '6';
+                     $step6->semester = $semester;
+                     $step6->id_user = $id_user;
                      $step6->nilai = Null;
                      $step6->save();
                 }
@@ -263,21 +293,25 @@ class AlternatifController extends Controller
         foreach($alter as $a)
         {
             $aid = $a['id'];
-            $nilai_a = Promethee::where('step','6')->where('id_alternatif',$aid)->avg('nilai');
-            $nilai_b = Promethee::where('step','6')->where('id_alternatif2',$aid)->avg('nilai');
+            $nilai_a = Promethee::where('step','6')->where('semester',$semester)->where('id_user', $id_user)->where('id_alternatif',$aid)->avg('nilai');
+            $nilai_b = Promethee::where('step','6')->where('semester',$semester)->where('id_user', $id_user)->where('id_alternatif2',$aid)->avg('nilai');
             $ef[] = $nilai_b;
             $hasil = $nilai_a-$nilai_b;
             //input to table
             $step7 = new Promethee();
             $step7->id_alternatif = $a['id'];
             $step7->step = '7';
+            $step7->semester = $semester;
+            $step7->id_user = $id_user;
             $step7->nilai = $hasil;
             $step7->save();
         }
-        $pro6 = Promethee::where('step','6')->orderBy('id_alternatif','ASC')->get();
+        $pro6 = Promethee::where('step','6')->where('semester',$semester)->where('id_user', $id_user)->orderBy('id_alternatif','ASC')->get();
         $pro7 = DB::table('promethee')
         ->leftJoin('alternatifs', 'id_alternatif', '=', 'alternatifs.id')
         ->where('promethee.step','=','7')
+        ->where('promethee.semester','=',$semester)
+        ->where('promethee.id_user','=',$id_user)
         ->orderBy('promethee.nilai','DESC')
         ->get();
         // $pro7 = Promethee::where('step','7')->orderBy('nilai','DESC')->get();

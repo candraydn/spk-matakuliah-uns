@@ -39,12 +39,33 @@
                       <li class="nav-item">
                         <a class="nav-link" href="{{ route('alternatif') }}">Alternatif</a>
                       </li>
-                      <li class="nav-item">
+                      {{-- <li class="nav-item">
                         <a class="nav-link" href="{{ route('bobot.kriteria') }}">Bobot Kriteria</a>
                       </li>
                       <li class="nav-item">
                         <a class="nav-link" href="{{ route('bobot.alternatif') }}">Bobot Alternatif</a>
                       </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ route('report.index') }}">Laporan</a>
+                      </li> --}}
+                      <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            Perhitungan
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('bobot.kriteria') }}">
+                                Bobot Kriteria
+                            </a>
+                            <a class="dropdown-item" href="{{ route('bobot.alternatif') }}">
+                                Bobot Matakuliah
+                            </a>
+                            <a class="dropdown-item" href="{{ route('report.index') }}">
+                                Laporan
+                            </a>
+                            
+                        </div>
+                    </li>
                     </ul>
                   </div>
 
@@ -81,6 +102,12 @@
                                     </a>
                                     <a class="dropdown-item" href="{{ route('bobot.kriteria') }}">
                                         Bobot Kriteria
+                                    </a>
+                                    <a class="dropdown-item" href="{{ route('bobot.alternatif') }}">
+                                        Bobot Matakuliah
+                                    </a>
+                                    <a class="dropdown-item" href="{{ route('report.index') }}">
+                                        Laporan
                                     </a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
